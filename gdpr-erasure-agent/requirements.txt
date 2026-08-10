@@ -1,0 +1,14 @@
+faiss-cpu>=1.7.4
+numpy>=1.24
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.0
+pytest>=8.0
+
+# Optional, for production-grade name detection instead of the regex fallback:
+# spacy>=3.7
+# (after installing: python -m spacy download en_core_web_sm)
+
+# Optional, for real embeddings instead of the demo stub_embed:
+# sentence-transformers>=2.5
+# or: anthropic / openai SDK if using API-based embeddings

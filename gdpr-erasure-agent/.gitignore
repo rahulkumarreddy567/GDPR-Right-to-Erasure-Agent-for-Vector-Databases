@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+data/
+*.faiss
+*.db
+*.jsonl
+_demo_data/
+_test_data/
+.pytest_cache/
