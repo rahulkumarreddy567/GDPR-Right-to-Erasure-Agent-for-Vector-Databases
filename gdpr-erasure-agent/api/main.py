@@ -26,6 +26,8 @@ from src.subject_registry import SubjectRegistry
 from src.vector_store import VectorStore
 
 DIM = 128
+DATA_DIR = os.environ.get("DATA_DIR", "data")
+os.makedirs(DATA_DIR, exist_ok=True)
 
 
 def stub_embed(text: str) -> np.ndarray:
@@ -37,9 +39,13 @@ def stub_embed(text: str) -> np.ndarray:
     return rng.standard_normal(DIM).astype("float32")
 
 
-vector_store = VectorStore(dim=DIM, index_path="data/vectors.faiss", db_path="data/chunks.db")
-registry = SubjectRegistry(db_path="data/subject_registry.db")
-audit_log = AuditLog(path="data/audit_log.jsonl")
+vector_store = VectorStore(
+    dim=DIM,
+    index_path=os.path.join(DATA_DIR, "vectors.faiss"),
+    db_path=os.path.join(DATA_DIR, "chunks.db"),
+)
+registry = SubjectRegistry(db_path=os.path.join(DATA_DIR, "subject_registry.db"))
+audit_log = AuditLog(path=os.path.join(DATA_DIR, "audit_log.jsonl"))
 
 pipeline = IngestionPipeline(vector_store, registry, stub_embed, audit_log=audit_log)
 agent = ErasureAgent(vector_store, registry, audit_log)
