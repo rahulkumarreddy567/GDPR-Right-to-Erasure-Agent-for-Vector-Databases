@@ -141,6 +141,8 @@ The service exposes:
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
+| `GET` | `/` | Service status and useful links |
+| `GET` | `/health` | Lightweight health check |
 | `POST` | `/ingest` | Scan and ingest a document |
 | `POST` | `/erase` | Resolve and process an erasure request |
 | `GET` | `/audit-log` | Return the audit entries and chain status |

@@ -62,6 +62,21 @@ class ErasureRequest(BaseModel):
     identifier: str  # email, phone, or full name mentioned in a document
 
 
+@app.get("/")
+def root():
+    return {
+        "service": "GDPR Right-to-Erasure Agent",
+        "status": "ok",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.post("/ingest")
 def ingest(req: IngestRequest):
     return pipeline.ingest_document(req.text, source_path=req.source_path)
