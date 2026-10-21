@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Erasure Guard | GDPR Demo</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(15, 29, 50, .82);
+      --panel-light: #132542;
+      --text: #eef5ff;
+      --muted: #9db0c9;
+      --cyan: #54d9ff;
+      --green: #4ee1a1;
+      --red: #ff7d91;
+      --line: rgba(157, 176, 201, .2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: radial-gradient(circle at 15% 0%, #153964 0, transparent 35%),
+                  radial-gradient(circle at 90% 20%, #163c46 0, transparent 30%), var(--bg);
+      font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: auto; padding: 34px 0 54px; }
+    header { display: flex; justify-content: space-between; gap: 20px; align-items: start; margin-bottom: 30px; }
+    .eyebrow { color: var(--cyan); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; }
+    h1 { margin: 8px 0 8px; font-size: clamp(30px, 5vw, 50px); line-height: 1.05; }
+    h2 { margin: 0 0 6px; font-size: 20px; }
+    p { color: var(--muted); margin: 0; }
+    .badge { border: 1px solid rgba(78, 225, 161, .4); color: var(--green); border-radius: 999px; padding: 8px 13px; white-space: nowrap; font-size: 13px; }
+    .grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: 0 18px 50px rgba(0,0,0,.18); backdrop-filter: blur(12px); }
+    .wide { grid-column: 1 / -1; }
+    label { display: block; color: var(--muted); font-size: 13px; margin: 16px 0 7px; }
+    input, textarea {
+      width: 100%; color: var(--text); background: rgba(5, 15, 29, .7); border: 1px solid var(--line);
+      border-radius: 10px; padding: 12px 13px; font: inherit; outline: none;
+    }
+    input:focus, textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(84,217,255,.12); }
+    textarea { min-height: 125px; resize: vertical; }
+    button, .link {
+      display: inline-block; border: 0; border-radius: 10px; padding: 11px 15px; margin-top: 14px;
+      color: #04121d; background: var(--cyan); font: inherit; font-weight: 750; cursor: pointer; text-decoration: none;
+    }
+    button.secondary, .link.secondary { color: var(--text); background: var(--panel-light); border: 1px solid var(--line); }
+    button:disabled { opacity: .6; cursor: wait; }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 18px; }
+    .stat { background: rgba(5, 15, 29, .55); padding: 16px; border-radius: 12px; }
+    .stat strong { display: block; color: var(--cyan); font-size: 27px; }
+    .result { white-space: pre-wrap; overflow: auto; max-height: 280px; margin-top: 16px; padding: 15px; border-radius: 10px; background: #050d18; color: #c9e5ff; font: 12px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .steps { display: grid; gap: 12px; margin-top: 16px; }
+    .step { display: flex; gap: 12px; align-items: start; color: var(--muted); }
+    .step b { display: grid; place-items: center; min-width: 25px; height: 25px; border-radius: 50%; background: rgba(84,217,255,.15); color: var(--cyan); }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    footer { margin-top: 24px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 760px) { header { display: block; } .badge { display: inline-block; margin-top: 18px; } .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">GDPR Right to Erasure</div>
+        <h1>Erasure Guard</h1>
+        <p>Ingest protected content, remove one person’s vectors, and verify the audit trail.</p>
+      </div>
+      <div class="badge">● Live Azure demo</div>
+    </header>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>1. Ingest a document</h2>
+        <p>PII is detected before the text is embedded.</p>
+        <label for="source">Source name</label>
+        <input id="source" value="customer-support-demo.txt">
+        <label for="text">Document text</label>
+        <textarea id="text">Customer Jean Dupont can be contacted at jean.dupont@example.com about order 1042.</textarea>
+        <button id="ingest">Ingest securely</button>
+        <div id="ingestResult" class="result" hidden></div>
+      </article>
+
+      <article class="panel">
+        <h2>2. Request erasure</h2>
+        <p>Use the same hard identifier to find the subject.</p>
+        <label for="identifier">Email or phone number</label>
+        <input id="identifier" value="jean.dupont@example.com">
+        <button id="erase">Erase this subject</button>
+        <div id="eraseResult" class="result" hidden></div>
+      </article>
+
+      <article class="panel">
+        <h2>System status</h2>
+        <p>Live counts from the vector store.</p>
+        <div class="stats">
+          <div class="stat"><strong id="chunks">—</strong>stored chunks</div>
+          <div class="stat"><strong id="vectors">—</strong>FAISS vectors</div>
+        </div>
+        <div class="actions">
+          <button id="refresh" class="secondary">Refresh stats</button>
+          <a class="link secondary" href="/docs" target="_blank">Open API docs</a>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>How the demo works</h2>
+        <div class="steps">
+          <div class="step"><b>1</b><span>PII is fingerprinted and linked to a stable subject ID.</span></div>
+          <div class="step"><b>2</b><span>FAISS vectors and SQLite metadata are tagged for surgical deletion.</span></div>
+          <div class="step"><b>3</b><span>Erasure removes matching data and appends a tamper-evident audit event.</span></div>
+        </div>
+      </article>
+
+      <article class="panel wide">
+        <div class="actions">
+          <button id="audit" class="secondary">Verify audit log</button>
+          <button id="clear" class="secondary">Clear output</button>
+        </div>
+        <div id="auditResult" class="result" hidden></div>
+      </article>
+    </section>
+    <footer>Demo data is stored by the deployed service. Do not enter real personal data.</footer>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const show = (id, value) => { const el = $(id); el.hidden = false; el.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2); };
+    async function call(path, options = {}) {
+      const response = await fetch(path, { headers: {"Content-Type": "application/json"}, ...options });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || `Request failed (${response.status})`);
+      return data;
+    }
+    async function refreshStats() {
+      try {
+        const data = await call("/stats");
+        $("chunks").textContent = data.total_chunks ?? 0;
+        $("vectors").textContent = data.index_ntotal ?? 0;
+      } catch (error) { show("auditResult", error.message); }
+    }
+    $("ingest").onclick = async () => {
+      $("ingest").disabled = true;
+      try {
+        const data = await call("/ingest", { method: "POST", body: JSON.stringify({ text: $("text").value, source_path: $("source").value }) });
+        show("ingestResult", data); await refreshStats();
+      } catch (error) { show("ingestResult", error.message); } finally { $("ingest").disabled = false; }
+    };
+    $("erase").onclick = async () => {
+      $("erase").disabled = true;
+      try {
+        const data = await call("/erase", { method: "POST", body: JSON.stringify({ identifier: $("identifier").value }) });
+        show("eraseResult", data); await refreshStats();
+      } catch (error) { show("eraseResult", error.message); } finally { $("erase").disabled = false; }
+    };
+    $("refresh").onclick = refreshStats;
+    $("audit").onclick = async () => { try { show("auditResult", await call("/audit-log")); } catch (error) { show("auditResult", error.message); } };
+    $("clear").onclick = () => ["ingestResult", "eraseResult", "auditResult"].forEach((id) => { $(id).hidden = true; $(id).textContent = ""; });
+    refreshStats();
+  </script>
+</body>
+</html>

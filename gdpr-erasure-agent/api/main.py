@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import hashlib
 import numpy as np
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from src.audit_log import AuditLog
@@ -51,6 +52,7 @@ pipeline = IngestionPipeline(vector_store, registry, stub_embed, audit_log=audit
 agent = ErasureAgent(vector_store, registry, audit_log)
 
 app = FastAPI(title="GDPR Right-to-Erasure Agent for Vector Databases")
+UI_PATH = os.path.join(os.path.dirname(__file__), "static", "index.html")
 
 
 class IngestRequest(BaseModel):
@@ -64,12 +66,7 @@ class ErasureRequest(BaseModel):
 
 @app.get("/")
 def root():
-    return {
-        "service": "GDPR Right-to-Erasure Agent",
-        "status": "ok",
-        "docs": "/docs",
-        "health": "/health",
-    }
+    return FileResponse(UI_PATH)
 
 
 @app.get("/health")

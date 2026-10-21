@@ -148,6 +148,11 @@ The service exposes:
 | `GET` | `/audit-log` | Return the audit entries and chain status |
 | `GET` | `/stats` | Return vector and metadata counts |
 
+Open `http://localhost:8000/` for the browser demo UI. It provides guided
+buttons for ingesting a sample document, erasing a subject, viewing live
+statistics, and verifying the audit log. The same UI is served at the root of
+the Azure deployment.
+
 Example requests:
 
 ```powershell
